@@ -1,0 +1,13 @@
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\obj\Debug\UnitTimerSystem.Form1.resources
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\obj\Debug\UnitTimerSystem.Properties.Resources.resources
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\obj\Debug\UnitTimerSystem.csproj.GenerateResource.cache
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\obj\Debug\UnitTimerSystem.csproj.CoreCompileInputs.cache
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\bin\Debug\UnitTimerSystem.exe.config
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\bin\Debug\UnitTimerSystem.exe
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\bin\Debug\UnitTimerSystem.pdb
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\obj\Debug\UnitTimerSystem.exe
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\obj\Debug\UnitTimerSystem.pdb
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\obj\Debug\UnitTimerSystem.Form2.resources
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\obj\Debug\UnitTimerSystem.csprojAssemblyReference.cache
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\bin\Debug\Bunifu_UI_v1.52.dll
+C:\Users\2976709\source\repos\UnitTimerSystem\UnitTimerSystem\obj\Debug\UnitTimerSystem.csproj.CopyComplete
