@@ -303,7 +303,7 @@ namespace UnitTimerSystem
         private void button2_Click(object sender, EventArgs e)
         {
             t.Stop();
-            statuslb.Text = "Timer is stopped.";
+            statuslb.Text = "Timer is paused.";
             
         }
 
@@ -408,7 +408,6 @@ namespace UnitTimerSystem
                 button3.Enabled = false;
                 t.Dispose();
                 RunTimer();
-
             }
             catch (Exception ex)
             {
