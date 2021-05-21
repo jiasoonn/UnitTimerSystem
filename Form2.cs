@@ -73,107 +73,143 @@ namespace UnitTimerSystem
 
         private void RecentCT()
         {
-            int j = 0;
+            int j = 0, UnitCount = 0;
             for (j = 0; j < 10; j++)
             {
                 tableLayoutPanel1.Controls.Remove(tableLayoutPanel1.GetControlFromPosition(j + 1, 0));
                 tableLayoutPanel1.Controls.Remove(tableLayoutPanel1.GetControlFromPosition(j + 1, 1));
             }
 
-            string sql = "select top 10 * from timer where ModelLog = @m and ShiftLog = @sl and ShiftStart = @ss and ShiftEnd = @se ORDER BY ID DESC";
+            const string sql2 = @"SELECT COUNT(*) FROM timer WHERE ShiftLog = @sl AND ShiftStart = @ss AND ShiftEnd = @se AND ModelLog = @m";
+            OleDbCommand cmd2 = new OleDbCommand(sql2, connection);
 
-            using (OleDbCommand cmd = new OleDbCommand(sql, connection))
+            cmd2.Parameters.Add("@sl", OleDbType.VarWChar).Value = shiftlb.Text;
+            if (int.Parse(DateTime.Now.ToString("%H")) >= 7 && int.Parse(DateTime.Now.ToString("%H")) < 19) //Shift A
             {
-                cmd.Parameters.Add("@m", OleDbType.VarWChar).Value = mlb.Text;
-                cmd.Parameters.Add("@sl", OleDbType.VarWChar).Value = shiftlb.Text;
-                if (int.Parse(DateTime.Now.ToString("%H")) >= 7 && int.Parse(DateTime.Now.ToString("%H")) < 19) //Shift A
-                {
-                    cmd.Parameters.Add("@ss", OleDbType.VarWChar).Value = 7 + "&" + DateTime.Today.ToShortDateString();
-                    cmd.Parameters.Add("@se", OleDbType.VarWChar).Value = 1859 + "&" + DateTime.Today.ToShortDateString();
-                }
-                else if (int.Parse(DateTime.Now.ToString("%H")) >= 1 && int.Parse(DateTime.Now.ToString("%H")) < 7) //Shift B 1xxam to 659am
-                {
-                    cmd.Parameters.Add("@ss", OleDbType.VarWChar).Value = 19 + "&" + DateTime.Today.AddDays(-1).ToShortDateString();
-                    cmd.Parameters.Add("@se", OleDbType.VarWChar).Value = 659 + "&" + DateTime.Today.ToShortDateString();
-                }
-                else if (int.Parse(DateTime.Now.ToString("%H")) >= 19 && int.Parse(DateTime.Now.ToString("%H")) <= 24) //Shift B 7xxpm to 12xxam
-                {
-                    cmd.Parameters.Add("@ss", OleDbType.VarWChar).Value = 19 + "&" + DateTime.Today.ToShortDateString();
-                    cmd.Parameters.Add("@se", OleDbType.VarWChar).Value = 659 + "&" + DateTime.Today.AddDays(1).ToShortDateString();
-                }
+                cmd2.Parameters.Add("@ss", OleDbType.VarWChar).Value = 7 + "&" + DateTime.Today.ToShortDateString();
+                cmd2.Parameters.Add("@se", OleDbType.VarWChar).Value = 1859 + "&" + DateTime.Today.ToShortDateString();
+            }
+            else if (int.Parse(DateTime.Now.ToString("%H")) >= 1 && int.Parse(DateTime.Now.ToString("%H")) < 7) //Shift B 1xxam to 659am
+            {
+                cmd2.Parameters.Add("@ss", OleDbType.VarWChar).Value = 19 + "&" + DateTime.Today.AddDays(-1).ToShortDateString();
+                cmd2.Parameters.Add("@se", OleDbType.VarWChar).Value = 659 + "&" + DateTime.Today.ToShortDateString();
+            }
+            else if (int.Parse(DateTime.Now.ToString("%H")) >= 19 && int.Parse(DateTime.Now.ToString("%H")) <= 24) //Shift B 7xxpm to 12xxam
+            {
+                cmd2.Parameters.Add("@ss", OleDbType.VarWChar).Value = 19 + "&" + DateTime.Today.ToShortDateString();
+                cmd2.Parameters.Add("@se", OleDbType.VarWChar).Value = 659 + "&" + DateTime.Today.AddDays(1).ToShortDateString();
+            }
+            cmd2.Parameters.Add("@m", OleDbType.VarWChar).Value = mlb.Text;
 
-                try
+            try
+            {
+                connection.Open();
+                UnitCount = (Int32)cmd2.ExecuteScalar();
+                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Last UnitID cannot be retrieved. Error: " + ex.Message);
+                connection.Close();
+            }
+
+            if (UnitCount != 0) //if there is record in this shift
+            {
+                string sql = "select top 10 * from timer where ModelLog = @m and ShiftLog = @sl and ShiftStart = @ss and ShiftEnd = @se ORDER BY ID DESC"; //get last 10 records within same shift
+
+                using (OleDbCommand cmd = new OleDbCommand(sql, connection))
                 {
-                    connection.Open();
-                    Label[] labels = new Label[10];
-                    Label[] labels2 = new Label[10];
-                    int i = 0;
-                    Decimal total = 0;
-                    using (var reader = cmd.ExecuteReader())
+                    cmd.Parameters.Add("@m", OleDbType.VarWChar).Value = mlb.Text;
+                    cmd.Parameters.Add("@sl", OleDbType.VarWChar).Value = shiftlb.Text;
+                    if (int.Parse(DateTime.Now.ToString("%H")) >= 7 && int.Parse(DateTime.Now.ToString("%H")) < 19) //Shift A
                     {
-                        while (reader.Read())
-                        {         
-                            if(int.Parse(reader["CTLog"].ToString()) > int.Parse(sctlb.Text))
+                        cmd.Parameters.Add("@ss", OleDbType.VarWChar).Value = 7 + "&" + DateTime.Today.ToShortDateString();
+                        cmd.Parameters.Add("@se", OleDbType.VarWChar).Value = 1859 + "&" + DateTime.Today.ToShortDateString();
+                    }
+                    else if (int.Parse(DateTime.Now.ToString("%H")) >= 1 && int.Parse(DateTime.Now.ToString("%H")) < 7) //Shift B 1xxam to 659am
+                    {
+                        cmd.Parameters.Add("@ss", OleDbType.VarWChar).Value = 19 + "&" + DateTime.Today.AddDays(-1).ToShortDateString();
+                        cmd.Parameters.Add("@se", OleDbType.VarWChar).Value = 659 + "&" + DateTime.Today.ToShortDateString();
+                    }
+                    else if (int.Parse(DateTime.Now.ToString("%H")) >= 19 && int.Parse(DateTime.Now.ToString("%H")) <= 24) //Shift B 7xxpm to 12xxam
+                    {
+                        cmd.Parameters.Add("@ss", OleDbType.VarWChar).Value = 19 + "&" + DateTime.Today.ToShortDateString();
+                        cmd.Parameters.Add("@se", OleDbType.VarWChar).Value = 659 + "&" + DateTime.Today.AddDays(1).ToShortDateString();
+                    }
+
+                    try
+                    {
+                        connection.Open();
+                        Label[] labels = new Label[10];
+                        Label[] labels2 = new Label[10];
+                        int i = 0;
+                        Decimal total = 0;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
                             {
-                                labels[i] = new Label
+                                if (int.Parse(reader["CTLog"].ToString()) > int.Parse(sctlb.Text))
                                 {
-                                    Text = reader["CTLog"].ToString(),
-                                    Anchor = AnchorStyles.None,
-                                    Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
-                                    TextAlign = ContentAlignment.MiddleCenter,
-                                    ForeColor = Color.White,
-                                    BackColor = Color.Red
-                                };
-                                labels2[i] = new Label
+                                    labels[i] = new Label
+                                    {
+                                        Text = reader["CTLog"].ToString(),
+                                        Anchor = AnchorStyles.None,
+                                        Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
+                                        TextAlign = ContentAlignment.MiddleCenter,
+                                        ForeColor = Color.White,
+                                        BackColor = Color.Red
+                                    };
+                                    labels2[i] = new Label
+                                    {
+                                        Text = "Unit " + reader["UnitID"].ToString(),
+                                        Anchor = AnchorStyles.None,
+                                        Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
+                                        TextAlign = ContentAlignment.MiddleCenter,
+                                        ForeColor = Color.White,
+                                        BackColor = Color.Red
+                                    };
+                                }
+                                else if (int.Parse(reader["CTLog"].ToString()) <= int.Parse(sctlb.Text))
                                 {
-                                    Text = "Unit " + reader["UnitID"].ToString(),
-                                    Anchor = AnchorStyles.None,
-                                    Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
-                                    TextAlign = ContentAlignment.MiddleCenter,
-                                    ForeColor = Color.White,
-                                    BackColor = Color.Red
-                                };
+                                    labels[i] = new Label
+                                    {
+                                        Text = reader["CTLog"].ToString(),
+                                        Anchor = AnchorStyles.None,
+                                        Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
+                                        TextAlign = ContentAlignment.MiddleCenter,
+                                        ForeColor = Color.White,
+                                        BackColor = Color.Green
+                                    };
+                                    labels2[i] = new Label
+                                    {
+                                        Text = "Unit " + reader["UnitID"].ToString(),
+                                        Anchor = AnchorStyles.None,
+                                        Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
+                                        TextAlign = ContentAlignment.MiddleCenter,
+                                        ForeColor = Color.White,
+                                        BackColor = Color.Green
+                                    };
+                                }
+                                tableLayoutPanel1.Controls.Add(labels2[i], i + 1, 0);
+                                tableLayoutPanel1.Controls.Add(labels[i], i + 1, 1);
+                                i++;
+                                total += int.Parse(reader["CTLog"].ToString());
                             }
-                            else if (int.Parse(reader["CTLog"].ToString()) <= int.Parse(sctlb.Text))
-                            {
-                                labels[i] = new Label
-                                {
-                                    Text = reader["CTLog"].ToString(),
-                                    Anchor = AnchorStyles.None,
-                                    Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
-                                    TextAlign = ContentAlignment.MiddleCenter,
-                                    ForeColor = Color.White,
-                                    BackColor = Color.Green
-                                };
-                                labels2[i] = new Label
-                                {
-                                    Text = "Unit " + reader["UnitID"].ToString(),
-                                    Anchor = AnchorStyles.None,
-                                    Font = new Font("Microsoft Sans Serif", 10, FontStyle.Regular),
-                                    TextAlign = ContentAlignment.MiddleCenter,
-                                    ForeColor = Color.White,
-                                    BackColor = Color.Green
-                                };
-                            }
-                            tableLayoutPanel1.Controls.Add(labels2[i], i + 1, 0);
-                            tableLayoutPanel1.Controls.Add(labels[i], i + 1, 1);
-                            i++;
-                            total += int.Parse(reader["CTLog"].ToString());
+                            var AveCT = Math.Round(Convert.ToDecimal(total / i), 2);
+                            actlb.Text = AveCT.ToString();
+
                         }
-                        var AveCT = Math.Round(Convert.ToDecimal(total / i), 2) ;
-                        actlb.Text = AveCT.ToString();
+                        connection.Close();
+
 
                     }
-                    connection.Close();
-
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Recent cycle time records cannot be retrieved. Error: " + ex.Message);
+                        connection.Close();
+                    }
 
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Recent cycle time records cannot be retrieved. Error: " + ex.Message);
-                    connection.Close();
-                }
-
             }
         }
 
